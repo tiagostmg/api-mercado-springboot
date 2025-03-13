@@ -18,8 +18,9 @@ public class ClientController {
     }
 
     @PostMapping
-    public Client save(@RequestBody Client client) {
-        return clientService.save(client);
+    public List<Client> save(@RequestBody Client client) {
+        clientService.save(client);
+        return getAll();
     }
 
     @GetMapping
@@ -33,11 +34,15 @@ public class ClientController {
     }
 
     @PutMapping
-    public Client update(@RequestBody Client client) {
-        return clientService.save(client);
+    public List<Client> update(@RequestBody Client client) {
+        clientService.save(client);
+        return getAll();
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {}
+    public List<Client> delete(@PathVariable Long id) {
+        clientService.delete(id);
+        return getAll();
+    }
 
 }
