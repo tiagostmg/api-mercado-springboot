@@ -2,10 +2,10 @@ package com.tiagostmg.mercadoapi.controller;
 
 import com.tiagostmg.mercadoapi.entity.Product;
 import com.tiagostmg.mercadoapi.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
@@ -26,6 +26,11 @@ public class ProductController {
     @GetMapping
     public List<Product> getAll() {
         return productService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Product> getById(@PathVariable Long id) {
+        return productService.getById(id);
     }
 
     @PutMapping

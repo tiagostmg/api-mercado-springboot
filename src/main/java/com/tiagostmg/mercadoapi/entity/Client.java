@@ -6,25 +6,21 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "product")
-public class Product {
+@Table(name = "client")
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private double price;
-    private int quantity;
+    private double balance;
 
-    public Product(String name, double price, int quantity) {
+    public Client(String name, double balance) {
         this.name = name;
-        this.price = price;
-        this.quantity = quantity;
+        this.balance = balance;
     }
 
-    public Product() {
-
-    }
+    public Client() {}
 
     public Long getId() {
         return id;
@@ -42,19 +38,11 @@ public class Product {
         this.name = name;
     }
 
-    public double getPrice() {
-        return price;
+    public double getBalance() {
+        return balance;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 }
