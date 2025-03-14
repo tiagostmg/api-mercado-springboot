@@ -6,7 +6,11 @@ import com.tiagostmg.mercadoapi.entity.Purchase;
 import com.tiagostmg.mercadoapi.repository.ClientRepository;
 import com.tiagostmg.mercadoapi.repository.ProductRepository;
 import com.tiagostmg.mercadoapi.repository.PurchaseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PurchaseService {
@@ -21,6 +25,7 @@ public class PurchaseService {
         this.purchaseRepository = purchaseRepository;
     }
 
+    @Transactional
     public String makePurchase(Long clientId, Long productId, int quantity) {
         // Buscar cliente e produto
         Client client = clientRepository.findById(clientId).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
@@ -46,10 +51,15 @@ public class PurchaseService {
         productRepository.save(product);
 
         // Registrar a compra (Opcional)
-        Purchase purchase = new Purchase(client, product, quantity);
+        LocalDateTime date = LocalDateTime.now();
+        Purchase purchase = new Purchase(client, product, quantity, date);
         purchaseRepository.save(purchase);
 
         return "Compra realizada com sucesso!";
+    }
+
+    public List<Purchase> getPurchases() {
+        return purchaseRepository.findAll();
     }
 
 }
