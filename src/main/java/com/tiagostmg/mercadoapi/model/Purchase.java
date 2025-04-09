@@ -1,4 +1,4 @@
-package com.tiagostmg.mercadoapi.entity;
+package com.tiagostmg.mercadoapi.model;
 
 
 import jakarta.persistence.*;

@@ -1,6 +1,6 @@
 package com.tiagostmg.mercadoapi.repository;
 
-import com.tiagostmg.mercadoapi.entity.Purchase;
+import com.tiagostmg.mercadoapi.model.Purchase;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

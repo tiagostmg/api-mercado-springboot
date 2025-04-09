@@ -1,6 +1,6 @@
 package com.tiagostmg.mercadoapi.controller;
 
-import com.tiagostmg.mercadoapi.entity.Product;
+import com.tiagostmg.mercadoapi.model.Product;
 import com.tiagostmg.mercadoapi.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 

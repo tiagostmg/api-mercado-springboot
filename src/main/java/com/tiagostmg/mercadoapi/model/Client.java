@@ -1,4 +1,4 @@
-package com.tiagostmg.mercadoapi.entity;
+package com.tiagostmg.mercadoapi.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,6 +16,7 @@ public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
     private double balance;
 

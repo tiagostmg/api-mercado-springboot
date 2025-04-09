@@ -1,6 +1,6 @@
 package com.tiagostmg.mercadoapi.service;
 
-import com.tiagostmg.mercadoapi.entity.Client;
+import com.tiagostmg.mercadoapi.model.Client;
 import com.tiagostmg.mercadoapi.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
