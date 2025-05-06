@@ -17,7 +17,7 @@ public class SwaggerConfig {
                         .version("v1.0")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("Documentação Completa")
-                        .url("https://github.com/tiagostmg/mercado-api"));
+                        .description("Repositório do GitHub")
+                        .url("https://github.com/tiagostmg/api-mercado-springboot"));
     }
 }
