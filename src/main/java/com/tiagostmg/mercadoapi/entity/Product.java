@@ -1,4 +1,4 @@
-package com.tiagostmg.mercadoapi.model;
+package com.tiagostmg.mercadoapi.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
