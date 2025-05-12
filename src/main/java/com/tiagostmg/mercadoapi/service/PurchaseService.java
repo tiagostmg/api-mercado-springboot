@@ -48,16 +48,16 @@ public class PurchaseService {
 
     private void validatePurchase(Client client, Product product, int quantity) {
         if (quantity <= 0) {
-            throw new PurchaseException("Quantidade deve ser maior que zero");
+            throw PurchaseException.invalidQuantity();
         }
 
         if (product.getQuantity() < quantity) {
-            throw new InsufficientStockException(product.getQuantity(), quantity);
+            throw PurchaseException.insufficientStock(product.getQuantity(), quantity);
         }
 
         double totalPrice = product.getPrice() * quantity;
         if (client.getBalance() < totalPrice) {
-            throw new InsufficientBalanceException(client.getBalance(), totalPrice);
+            throw PurchaseException.insufficientBalance(client.getBalance(), totalPrice);
         }
     }
 
@@ -82,6 +82,6 @@ public class PurchaseService {
 
     public Purchase getPurchaseById(Long id) {
         return purchaseRepository.findById(id)
-                .orElseThrow(() -> new PurchaseNotFoundException(id));
+                .orElseThrow(() -> PurchaseException.purchaseNotFound(id));
     }
 }
