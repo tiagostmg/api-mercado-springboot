@@ -17,8 +17,8 @@ public class ClientService {
     }
 
 
-    public void save(Client client) {
-        clientRepository.save(client);
+    public Client save(Client client) {
+        return clientRepository.save(client);
     }
 
     public List<Client> getAll(){
@@ -29,8 +29,10 @@ public class ClientService {
         return clientRepository.findById(id);
     }
 
-    public void delete(Long id) {
+    public Optional<Client> delete(Long id) {
+        Optional<Client> client = clientRepository.findById(id);
         clientRepository.deleteById(id);
+        return client;
     }
 
     public boolean existsById(Long id) {

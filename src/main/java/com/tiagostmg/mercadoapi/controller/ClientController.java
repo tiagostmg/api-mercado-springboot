@@ -28,9 +28,10 @@ public class ClientController {
     @ApiResponse(responseCode = "200", description = "Cliente criado com sucesso")
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @PostMapping
-    public ResponseEntity<List<ClientDTO>> create(@Valid @RequestBody ClientDTO clientDTO) {
-        clientService.save(clientDTO.toEntity());
-        return ResponseEntity.ok(getAll());
+    public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
+        Client client = clientService.save(clientDTO.toEntity());
+        ClientDTO responseDTO = ClientDTO.fromEntity(client);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @Operation(summary = "Lista todos os clientes")
@@ -56,13 +57,14 @@ public class ClientController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos")
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     @PutMapping("/{id}")
-    public ResponseEntity<List<ClientDTO>> update(@PathVariable Long id, @Valid @RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<ClientDTO> update(@PathVariable Long id, @Valid @RequestBody ClientDTO clientDTO) {
         Optional<Client> clientOptional = clientService.getById(id);
         if (clientOptional.isPresent()) {
             Client client = clientDTO.toEntity();
             client.setId(id);
-            clientService.save(client);
-            return ResponseEntity.ok(getAll());
+            Client clientResponse = clientService.save(client);
+            ClientDTO responseDTO = ClientDTO.fromEntity(clientResponse);
+            return ResponseEntity.ok(responseDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -72,10 +74,11 @@ public class ClientController {
     @ApiResponse(responseCode = "200", description = "Cliente excluído com sucesso")
     @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<ClientDTO>> delete(@PathVariable Long id) {
+    public ResponseEntity<ClientDTO> delete(@PathVariable Long id) {
         if (clientService.existsById(id)) {
-            clientService.delete(id);
-            return ResponseEntity.ok(getAll());
+            Optional<Client> client = clientService.delete(id);
+            ClientDTO responseDTO = ClientDTO.fromEntity(client.get());
+            return ResponseEntity.ok(responseDTO);
         } else {
             return ResponseEntity.notFound().build();
         }
