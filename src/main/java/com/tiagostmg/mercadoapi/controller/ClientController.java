@@ -5,16 +5,17 @@ import com.tiagostmg.mercadoapi.entity.Client;
 import com.tiagostmg.mercadoapi.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("/api/clients")
 public class ClientController {
 
     private final ClientService clientService;
@@ -23,65 +24,59 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-
     @Operation(summary = "Cria um novo cliente")
-    @ApiResponse(responseCode = "200", description = "Cliente criado com sucesso")
-    @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Cliente criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     @PostMapping
-    public ResponseEntity<ClientDTO> create(@Valid @RequestBody ClientDTO clientDTO) {
-        Client client = clientService.save(clientDTO.toEntity());
-        ClientDTO responseDTO = ClientDTO.fromEntity(client);
-        return ResponseEntity.ok(responseDTO);
+    public ResponseEntity<ClientDTO> createClient(@Valid @RequestBody ClientDTO clientDTO) {
+        Client client = clientService.createClient(clientDTO.toEntity());
+        return ResponseEntity.status(HttpStatus.CREATED).body(ClientDTO.fromEntity(client));
     }
 
     @Operation(summary = "Lista todos os clientes")
     @GetMapping
-    public List<ClientDTO> getAll() {
-        return clientService.getAll().stream()
+    public ResponseEntity<List<ClientDTO>> getAllClients() {
+        List<ClientDTO> clients = clientService.getAllClients().stream()
                 .map(ClientDTO::fromEntity)
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(clients);
     }
 
-    @Operation(summary = "Lista cliente por id")
-    @ApiResponse(responseCode = "200", description = "Cliente encontrado com sucesso")
-    @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    @Operation(summary = "Obtém um cliente pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<ClientDTO> getById(@PathVariable Long id) {
-        Optional<Client> clientOptional = clientService.getById(id);
-        return clientOptional.map(client -> ResponseEntity.ok(ClientDTO.fromEntity(client)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
+        Client client = clientService.getClientById(id);
+        return ResponseEntity.ok(ClientDTO.fromEntity(client));
     }
 
     @Operation(summary = "Atualiza um cliente existente")
-    @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso")
-    @ApiResponse(responseCode = "400", description = "Dados inválidos")
-    @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente atualizado"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<ClientDTO> update(@PathVariable Long id, @Valid @RequestBody ClientDTO clientDTO) {
-        Optional<Client> clientOptional = clientService.getById(id);
-        if (clientOptional.isPresent()) {
-            Client client = clientDTO.toEntity();
-            client.setId(id);
-            Client clientResponse = clientService.save(client);
-            ClientDTO responseDTO = ClientDTO.fromEntity(clientResponse);
-            return ResponseEntity.ok(responseDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ClientDTO> updateClient(
+            @PathVariable Long id,
+            @Valid @RequestBody ClientDTO clientDTO) {
+        Client updatedClient = clientService.updateClient(id, clientDTO.toEntity());
+        return ResponseEntity.ok(ClientDTO.fromEntity(updatedClient));
     }
 
     @Operation(summary = "Exclui um cliente")
-    @ApiResponse(responseCode = "200", description = "Cliente excluído com sucesso")
-    @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Cliente excluído"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<ClientDTO> delete(@PathVariable Long id) {
-        if (clientService.existsById(id)) {
-            Optional<Client> client = clientService.delete(id);
-            ClientDTO responseDTO = ClientDTO.fromEntity(client.get());
-            return ResponseEntity.ok(responseDTO);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+        clientService.deleteClient(id);
+        return ResponseEntity.noContent().build();
     }
-
 }

@@ -1,11 +1,12 @@
 package com.tiagostmg.mercadoapi.service;
 
 import com.tiagostmg.mercadoapi.entity.Product;
+import com.tiagostmg.mercadoapi.exception.ProductNotFoundException;
 import com.tiagostmg.mercadoapi.repository.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -16,24 +17,36 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-
-    public void save(Product product) {
-        productRepository.save(product);
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
     }
 
-    public List<Product> getAll() {
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public Optional<Product> getById(Long id) {
-        return productRepository.findById(id);
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    public void delete(Long id) {
+    public Product updateProduct(Long id, Product productDetails) {
+        Product product = getProductById(id);
+        product.setName(productDetails.getName());
+        product.setPrice(productDetails.getPrice());
+        product.setQuantity(productDetails.getQuantity());
+        return productRepository.save(product);
+    }
+
+    @Transactional
+    public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException(id);
+        }
         productRepository.deleteById(id);
     }
 
-    public boolean existsById(Long id) {
+    public boolean productExists(Long id) {
         return productRepository.existsById(id);
     }
 }

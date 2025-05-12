@@ -3,11 +3,12 @@ package com.tiagostmg.mercadoapi.service;
 import com.tiagostmg.mercadoapi.entity.Client;
 import com.tiagostmg.mercadoapi.entity.Product;
 import com.tiagostmg.mercadoapi.entity.Purchase;
+import com.tiagostmg.mercadoapi.exception.*;
 import com.tiagostmg.mercadoapi.repository.ClientRepository;
 import com.tiagostmg.mercadoapi.repository.ProductRepository;
 import com.tiagostmg.mercadoapi.repository.PurchaseRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,47 +20,68 @@ public class PurchaseService {
     private final ProductRepository productRepository;
     private final PurchaseRepository purchaseRepository;
 
-    public PurchaseService(ClientRepository clientRepository, ProductRepository productRepository, PurchaseRepository purchaseRepository) {
+    public PurchaseService(ClientRepository clientRepository,
+                           ProductRepository productRepository,
+                           PurchaseRepository purchaseRepository) {
         this.clientRepository = clientRepository;
         this.productRepository = productRepository;
         this.purchaseRepository = purchaseRepository;
     }
 
     @Transactional
-    public String makePurchase(Long clientId, Long productId, int quantity) {
-        // Buscar cliente e produto
-        Client client = clientRepository.findById(clientId).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+    public Purchase processPurchase(Long clientId, Long productId, int quantity) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new ClientNotFoundException(clientId));
 
-        // Verificar estoque
-        if (product.getQuantity() < quantity) {
-            return "Estoque insuficiente!";
-        }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        // Verificar saldo do cliente
-        double totalPrice = product.getPrice() * quantity;
-        if (client.getBalance() < totalPrice) {
-            return "Saldo insuficiente!";
-        }
+        validatePurchase(client, product, quantity);
 
-        // Atualizar saldo do cliente e estoque do produto
-        client.setBalance(client.getBalance() - totalPrice);
-        product.setQuantity(product.getQuantity() - quantity);
+        updateClientBalance(client, product, quantity);
+        updateProductStock(product, quantity);
 
-        // Salvar atualizações
-        clientRepository.save(client);
-        productRepository.save(product);
+        Purchase purchase = createPurchaseRecord(client, product, quantity);
 
-        // Registrar a compra (Opcional)
-        LocalDateTime date = LocalDateTime.now();
-        Purchase purchase = new Purchase(client, product, quantity, date);
-        purchaseRepository.save(purchase);
-
-        return "Compra realizada com sucesso!";
+        return purchaseRepository.save(purchase);
     }
 
-    public List<Purchase> getPurchases() {
+    private void validatePurchase(Client client, Product product, int quantity) {
+        if (quantity <= 0) {
+            throw new PurchaseException("Quantidade deve ser maior que zero");
+        }
+
+        if (product.getQuantity() < quantity) {
+            throw new InsufficientStockException(product.getQuantity(), quantity);
+        }
+
+        double totalPrice = product.getPrice() * quantity;
+        if (client.getBalance() < totalPrice) {
+            throw new InsufficientBalanceException(client.getBalance(), totalPrice);
+        }
+    }
+
+    private void updateClientBalance(Client client, Product product, int quantity) {
+        double totalPrice = product.getPrice() * quantity;
+        client.setBalance(client.getBalance() - totalPrice);
+        clientRepository.save(client);
+    }
+
+    private void updateProductStock(Product product, int quantity) {
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+    }
+
+    private Purchase createPurchaseRecord(Client client, Product product, int quantity) {
+        return new Purchase(client, product, quantity, LocalDateTime.now());
+    }
+
+    public List<Purchase> getAllPurchases() {
         return purchaseRepository.findAll();
     }
 
+    public Purchase getPurchaseById(Long id) {
+        return purchaseRepository.findById(id)
+                .orElseThrow(() -> new PurchaseNotFoundException(id));
+    }
 }
