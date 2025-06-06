@@ -1,5 +1,8 @@
 package com.tiagostmg.mercadoapi.exception;
 
+import lombok.Getter;
+
+@Getter
 public class PurchaseException extends RuntimeException {
 
     public enum ErrorType {
@@ -14,10 +17,6 @@ public class PurchaseException extends RuntimeException {
     public PurchaseException(ErrorType errorType, String message) {
         super(message);
         this.errorType = errorType;
-    }
-
-    public ErrorType getErrorType() {
-        return errorType;
     }
 
     public static PurchaseException purchaseNotFound(Long id) {
