@@ -2,7 +2,6 @@ package com.tiagostmg.mercadoapi.exception;
 
 public class PurchaseException extends RuntimeException {
 
-    // Tipos de erro possíveis
     public enum ErrorType {
         PURCHASE_NOT_FOUND,
         INSUFFICIENT_BALANCE,
@@ -21,7 +20,6 @@ public class PurchaseException extends RuntimeException {
         return errorType;
     }
 
-    // Métodos estáticos para criar exceções específicas
     public static PurchaseException purchaseNotFound(Long id) {
         return new PurchaseException(
                 ErrorType.PURCHASE_NOT_FOUND,
