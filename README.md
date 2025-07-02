@@ -26,7 +26,17 @@ api-mercado-springboot
 Para rodar:
 
     mvn spring-boot:run
+    
+### 🐳 Executando com Docker
 
+Você também pode executar a aplicação usando Docker:
+
+```bash
+docker pull tiagostmg/api-mercado
+docker run -p 8080:8080 tiagostmg/api-mercado
+```
+
+#
 
 ### 🌐 Documentação da API
 
